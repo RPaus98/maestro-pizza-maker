@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "maestro_pizza_maker"
+version = "202304.1001"
+description = ""
+authors = ["Martin Tlapak <martin.tlapak@eon.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8,<3.12"
+pandas = "^2.0.1"
+pytest = "^6.2.0"
+notebook = "^6.5.4"
+mip = "^1.15.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
+

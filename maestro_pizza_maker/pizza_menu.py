@@ -1,11 +1,13 @@
 # class representing the pizza menu
 
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict, Union
 
 import pandas as pd
+import numpy as np
 
-from maestro_pizza_maker.pizza import Pizza
+from maestro_pizza_maker.pizza import Pizza, PizzaIngredients
+from maestro_pizza_maker.ingredients import PizzaIngredient
 
 
 @dataclass
@@ -33,33 +35,51 @@ class PizzaMenu:
         # and ingredients contains a list of ingredients that the pizza contains
         #
         # The dataframe should be sorted by the price column in a descendent order
-        pass
+        assert sort_by in PizzaIngredient.__annotations__.keys()
+        data: List[Dict[str, Union[float, List[PizzaIngredients]]]] = \
+        [
+            {
+                "name": pizza.name,
+                "price": pizza.price,
+                "protein": pizza.protein,
+                "average_fat": pizza.average_fat,
+                "carbohydrates": pizza.carbohydrates,
+                "calories": pizza.calories,
+                "ingredients": pizza.ingredients
+            } \
+                for pizza in self.pizzas
+        ]
+        return pd.DataFrame(data).sort_values(by = sort_by, ascending=(not descendent))    
 
     @property
     def cheapest_pizza(self) -> Pizza:
         # TODO: return the cheapest pizza from the menu
-        pass
+        return sorted(self.pizzas, key=lambda x: x.price)[0]
 
     @property
     def most_caloric_pizza(self) -> Pizza:
         # TODO: return the most caloric pizza from the menu
-        pass
+        return sorted(self.pizzas, key=lambda x: x.calories)[-1]
 
     def get_most_fat_pizza(self, quantile: float = 0.5) -> Pizza:
         # TODO: return the most fat pizza from the menu
         # consider the fact that fat is random and it is not always the same, so you should return the pizza that has the most fat in the quantile of cases specified by the quantile parameter
-        pass
+        return sorted(self.pizzas, key=lambda x: np.quantile(x.fat, q=quantile))[-1]
 
     def add_pizza(self, pizza: Pizza) -> None:
         # TODO: code a function that adds a pizza to the menu
-        pass
+        assert isinstance(pizza, Pizza)
+        self.pizzas.append(pizza)
 
     def remove_pizza(self, pizza: Pizza) -> None:
         # TODO: code a function that removes a pizza from the menu
         # do not forget to check if the pizza is actually in the menu
         # if it is not in the menu, raise a ValueError
-        pass
+        try:
+            self.pizzas.remove(pizza)
+        except ValueError:
+            print("The pizza is not part of the menu. Try with another pizza.")
 
     def __len__(self) -> int:
         # TODO: return the number of pizzas in the menu
-        pass
+        return len(self.pizzas)

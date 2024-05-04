@@ -199,6 +199,8 @@ def maximize_taste_penalty_price(
 ) -> Pizza:
     # TODO: implement this function (description at the top of the file)
     # recomendation: use latex notation to describe the suggested model
+    
+    # Da rivedere 
     model = Model()
 
     # sets

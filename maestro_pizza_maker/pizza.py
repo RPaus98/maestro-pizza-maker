@@ -100,9 +100,6 @@ class Pizza:
         #Uniqueness
         id = str(uuid.uuid4())
         len = id.__len__()
-        A = random.randrange(0, len)
-        B = random.randrange(0, len)
-        C = random.randrange(0, len)
         names: List[str] = [ingredient.value.name for ingredient in self.ingredients]
         return "Pizza_with_" + "_&_".join(names) + "_" + id
 

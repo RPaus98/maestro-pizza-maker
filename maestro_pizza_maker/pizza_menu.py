@@ -65,6 +65,23 @@ class PizzaMenu:
         # TODO: return the most fat pizza from the menu
         # consider the fact that fat is random and it is not always the same, so you should return the pizza that has the most fat in the quantile of cases specified by the quantile parameter
         return sorted(self.pizzas, key=lambda x: np.quantile(x.fat, q=quantile))[-1]
+    
+    # Optional 5.2: Write other properties that might be useful.
+    def lowest_protein_pizza(self) -> Pizza:
+        # return the least proteic pizza from the menu
+        return sorted(self.pizzas, key=lambda x: x.protein)[0]
+
+    def highest_protein_pizza(self) -> Pizza:
+        # return the highest proteic pizza from the menu
+        return sorted(self.pizzas, key=lambda x: x.protein)[-1]
+
+    def lowest_carbohydrates_pizza(self) -> Pizza:
+        # return the pizza with less carbs from the menu
+        return sorted(self.pizzas, key=lambda x: x.carbohydrates)[0]
+
+    def highest_carbohydrates_pizza(self) -> Pizza:
+        # return the pizza with more carbs from the menu
+        return sorted(self.pizzas, key=lambda x: x.carbohydrates)[-1]
 
     def add_pizza(self, pizza: Pizza) -> None:
         # TODO: code a function that adds a pizza to the menu

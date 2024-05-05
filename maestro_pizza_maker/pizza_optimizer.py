@@ -200,21 +200,11 @@ def maximize_taste_penalty_price(
     # TODO: implement this function (description at the top of the file)
     # recomendation: use latex notation to describe the suggested model
     
-    # Da rivedere 
     model = Model()
 
     # sets
     ingredients = [ingredient for ingredient in PizzaIngredients]
     ingredients_names = [ingredient.name for ingredient in ingredients]
-
-    d = {
-        "DOUGH": 0.05,
-        "SAUCE": 0.2,
-        "CHEESE": 0.3,
-        "FRUIT": 0.1,
-        "MEAT": 0.05,
-        "VEGETABLE": 0.05
-    }
 
     # variables
     x = [
@@ -223,31 +213,31 @@ def maximize_taste_penalty_price(
     ]
 
     # set up for pizza taste
-    # taste = 0.05 * fat_dough + 0.2 * fat_sauce + 0.3 * fat_cheese + 0.1 * fat_fruits + 0.3 * fat_meat + 0.05 * fat_vegetables
-    fat = []
-    for f in ingredients:
-        n = f.value.type.name
-        if n == "DOUGH":
-            fat.append(f.value.fat * d["DOUGH"])
-        elif n == "SAUCE":
-            fat.append(f.value.fat * d["SAUCE"]) 
-        elif n == "CHEESE":
-            fat.append(f.value.fat * d["CHEESE"])
-        elif n == "FRUIT":
-            fat.append(f.value.fat * d["FRUIT"])
-        elif n == "MEAT":
-            fat.append(f.value.fat * d["MEAT"])
-        elif n == "VEGETABLE":
-            fat.append(f.value.fat * d["VEGETABLE"])
+    # REMAINDER: taste = 0.05 * fat_dough + 0.2 * fat_sauce + 0.3 * fat_cheese + 0.1 * fat_fruits + 0.3 * fat_meat + 0.05 * fat_vegetables
+    taste = []
+    for ingredient in ingredients:
+        n = ingredient.value.type.value
+        if n == "dough":
+            taste.append(ingredient.value.fat * 0.05)
+        elif n == "sauce":
+            taste.append(ingredient.value.fat * 0.2) 
+        elif n == "chees":
+            taste.append(ingredient.value.fat * 0.3)
+        elif n == "fruit":
+            taste.append(ingredient.value.fat * 0.1)
+        elif n == "meat":
+            taste.append(ingredient.value.fat * 0.05)
+        elif n == "vegetable":
+            taste.append(ingredient.value.fat * 0.05)
 
     # expected value of normally distributed is the mean. Normally distributed times 
     # the fat vector constant is still normally distributed.
-    mean_ingredient_fat = [f.mean() for f in fat]
+    mean_tastes = [fat.mean() for fat in taste]
 
     # objective setup
-    # taste is linear addition of normally distributed fats. so assume the expected value of taste is therefore
-    # the sum of mean ingredient fats
-    mean_pizza_taste = xsum(x[i] * mean_ingredient_fat[i] for i in range(len(mean_ingredient_fat)))
+    # taste is linear combination of normally distributed fats
+    mean_pizza_taste = xsum(x[i] * mean_tastes[i] for i in range(len(mean_tastes)))
+    #price as previous function
     price = xsum(x[i] * ingredients[i].value.price for i in range(len(ingredients)))
 
     # objective function
@@ -348,7 +338,7 @@ def maximize_taste_penalty_price(
     # solution
     return Pizza(
         dough=[
-            ingredients[i] #must be enum
+            ingredients[i] 
             for i in range(len(ingredients))
             if ingredients[i].value.type == IngredientType.DOUGH and x[i].x == 1
         ][0],
@@ -356,7 +346,7 @@ def maximize_taste_penalty_price(
             ingredients[i]
             for i in range(len(ingredients))
             if ingredients[i].value.type == IngredientType.SAUCE and x[i].x == 1
-        ][0], #cannot unpack list of sauce. only one sauce allowed in pizza dataclass def
+        ][0], 
         cheese=[
             ingredients[i]
             for i in range(len(ingredients))

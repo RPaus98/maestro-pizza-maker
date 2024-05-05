@@ -83,13 +83,13 @@ class Tests(unittest.TestCase):
     def test_most_caloric_pizza(self):
         df_test = self.pizza_menu.to_dataframe("calories", descendent=True)
         test_most_caloric_pizza = df_test.iloc[0]["calories"]
-        most_caloric_pizza = pizza_menu.most_caloric_pizza
+        most_caloric_pizza = self.pizza_menu.most_caloric_pizza
         self.assertEqual(test_most_caloric_pizza, most_caloric_pizza.calories)
     
     def test_cheapest_pizza(self):
         df_test = self.pizza_menu.to_dataframe("price", descendent=False)
         test_cheapest_pizza = df_test.iloc[0]["price"]
-        cheapest_pizza = pizza_menu.cheapest_pizza
+        cheapest_pizza = self.pizza_menu.cheapest_pizza
         self.assertEqual(test_cheapest_pizza, cheapest_pizza.price)
     
     def test_len(self):

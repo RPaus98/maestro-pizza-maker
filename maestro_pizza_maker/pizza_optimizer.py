@@ -225,7 +225,7 @@ def maximize_taste_penalty_price(
     """
     Objective Function:
     \[
-    \{maximize} \left( \sum_{i=1}^{n} \left( x_i \cdot \{taste}_i \right) - \lambda \cdot \left( \sum_{i=1}^{n} \left( x_i \cdot \{price}_i \right) \right) \right)
+    \{maximize} \left( \sum_{i=1}^{n} \left( x_i \cdot \E({taste}_i) \right) - \lambda \cdot \left( \sum_{i=1}^{n} \left( x_i \cdot \{price}_i \right) \right) \right)
     \]
 
     Subject to constraints:
@@ -284,18 +284,18 @@ def maximize_taste_penalty_price(
         elif name == "vegetable":
             taste.append(ingredient.value.fat * 0.05)
 
-    # Objective set-up: The objective function aims to maximize the taste of the pizza
+    # 3. Objective set-up: The objective function aims to maximize the taste of the pizza
     # minus a penalty term for its price, controlled by the parameter lambda_param (given from Maestro Pizza).
-    mean_tastes = np.average(taste, axis=1)
-    mean_pizza_taste = xsum(x[i] * mean_tastes[i] for i in range(len(mean_tastes)))
+    expected_tastes = np.average(taste, axis=1)
+    mean_pizza_taste = xsum(x[i] * expected_tastes[i] for i in range(len(expected_tastes)))
     
     #price as previous function
     price = xsum(x[i] * ingredients[i].value.price for i in range(len(ingredients)))
 
-    # objective function
+    # Objective function:
     model.objective = maximize(mean_pizza_taste - lambda_param * price)
 
-    # Constraint Setup: Constraints are added for various nutritional values (protein, fat, carbohydrates, calories) 
+    # 4. Constraint Setup: Constraints are added for various nutritional values (protein, fat, carbohydrates, calories) 
     # and the quantities of different types of ingredients (dough, sauce, cheese, etc.).
     model += (
         xsum(x[i] * ingredients[i].value.protein for i in range(len(ingredients)))

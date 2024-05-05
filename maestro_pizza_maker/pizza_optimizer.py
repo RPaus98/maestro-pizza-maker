@@ -47,7 +47,31 @@ def minimize_price(
     constraints_values: PizzaConstraintsValues,
     constraints_ingredients: PizzaConstraintsIngredients,
 ) -> Pizza:
-    """"""
+    """
+    Objective Function:
+    \[
+    \{minimize} \sum_{i=1}^{n} (x_i \cdot \{price}_i)
+    \]
+
+    Subject to constraints:
+    \[
+    &\sum_{i=1}^{n} (x_i \cdot \{protein}_i) \geq \{constraints\_values.protein.min} \\
+    &\sum_{i=1}^{n} (x_i \cdot \{protein}_i) \leq \{constraints\_values.protein.max} \\
+    &\{Similar constraints for fat, carbohydrates, and calories} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.dough} {(for dough)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.sauce} {(for sauce)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.cheese} {(for cheese)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.meat} {(for meat)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.vegetables} {(for vegetables)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.fruits} {(for fruits)}
+    \]
+
+    Where:
+    - \( x_i \) is a binary decision variable representing whether ingredient \( i \) is included in the pizza.
+    - \( \{price}_i \), \( \{protein}_i \), etc., are properties of ingredient \( i \) (price, protein content, etc.).
+    - \( \{constraints\_values.protein.min} \), \( \{constraints\_values.protein.max} \), etc., are the minimum and maximum constraints on nutritional values.
+    - \( \{constraints\_ingredients.dough} \), etc., are the constraints on the number of ingredients of each type to include in the pizza.
+    """
     model = Model()
 
     # sets
@@ -197,6 +221,34 @@ def maximize_taste_penalty_price(
     constraints_ingredients: PizzaConstraintsIngredients,
     lambda_param: float = 0.5,
 ) -> Pizza:
+    
+    """
+    Objective Function:
+    \[
+    \{maximize} \left( \sum_{i=1}^{n} \left( x_i \cdot \{taste}_i \right) - \lambda \cdot \left( \sum_{i=1}^{n} \left( x_i \cdot \{price}_i \right) \right) \right)
+    \]
+
+    Subject to constraints:
+    \[
+    &\sum_{i=1}^{n} \left( x_i \cdot \{protein}_i \right) \geq \{constraints\_values.protein.min} \\
+    &\sum_{i=1}^{n} \left( x_i \cdot \{protein}_i \right) \leq \{constraints\_values.protein.max} \\
+    &\{Similar constraints for fat, carbohydrates, and calories} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.dough} {(for dough)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.sauce} {(for sauce)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.cheese} {(for cheese)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.meat} {(for meat)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.vegetables} {(for vegetables)} \\
+    &\sum_{i=1}^{n} x_i = \{constraints\_ingredients.fruits} {(for fruits)}
+    \]
+
+    Where:
+    - \( x_i \) is a binary decision variable representing whether ingredient \( i \) is included in the pizza.
+    - \( \{taste}_i \) is the taste contribution of ingredient \( i \) based on its fat content.
+    - \( \{price}_i \) is the price of ingredient \( i \).
+    - \( \lambda \) is a parameter controlling the trade-off between taste and price (given as `lambda_param`).
+    - \( \{constraints\_values} \) and \( \{constraints\_ingredients} \) represent the constraints on nutritional values and ingredient types, respectively.
+    """
+
     # TODO: implement this function (description at the top of the file)
     # recomendation: use latex notation to describe the suggested model
     
@@ -206,44 +258,45 @@ def maximize_taste_penalty_price(
     ingredients = [ingredient for ingredient in PizzaIngredients]
     ingredients_names = [ingredient.name for ingredient in ingredients]
 
-    # variables
+    # variables: 1. Variable Setup: The sets up variables for each ingredient in the pizza.
     x = [
         model.add_var(var_type=INTEGER, lb=0, ub=1, name=ingredient)
         for ingredient in ingredients_names
     ]
 
-    # set up for pizza taste
+    # 2.Taste Calculation: It calculates the taste of the pizza based on the fat content of each ingredient, 
+    # considering different types of ingredients (dough, sauce, cheese, etc.).
     # REMAINDER: taste = 0.05 * fat_dough + 0.2 * fat_sauce + 0.3 * fat_cheese + 0.1 * fat_fruits + 0.3 * fat_meat + 0.05 * fat_vegetables
+    # taste is linear combination of normally distributed fats
     taste = []
     for ingredient in ingredients:
-        n = ingredient.value.type.value
-        if n == "dough":
+        name = ingredient.value.type.value
+        if name == "dough":
             taste.append(ingredient.value.fat * 0.05)
-        elif n == "sauce":
+        elif name == "sauce":
             taste.append(ingredient.value.fat * 0.2) 
-        elif n == "chees":
+        elif name == "cheese":
             taste.append(ingredient.value.fat * 0.3)
-        elif n == "fruit":
+        elif name == "fruit":
             taste.append(ingredient.value.fat * 0.1)
-        elif n == "meat":
+        elif name == "meat":
             taste.append(ingredient.value.fat * 0.05)
-        elif n == "vegetable":
+        elif name == "vegetable":
             taste.append(ingredient.value.fat * 0.05)
 
-    # expected value of normally distributed is the mean. Normally distributed times 
-    # the fat vector constant is still normally distributed.
-    mean_tastes = [fat.mean() for fat in taste]
-
-    # objective setup
-    # taste is linear combination of normally distributed fats
+    # Objective set-up: The objective function aims to maximize the taste of the pizza
+    # minus a penalty term for its price, controlled by the parameter lambda_param (given from Maestro Pizza).
+    mean_tastes = np.average(taste, axis=1)
     mean_pizza_taste = xsum(x[i] * mean_tastes[i] for i in range(len(mean_tastes)))
+    
     #price as previous function
     price = xsum(x[i] * ingredients[i].value.price for i in range(len(ingredients)))
 
     # objective function
     model.objective = maximize(mean_pizza_taste - lambda_param * price)
 
-    # constraints
+    # Constraint Setup: Constraints are added for various nutritional values (protein, fat, carbohydrates, calories) 
+    # and the quantities of different types of ingredients (dough, sauce, cheese, etc.).
     model += (
         xsum(x[i] * ingredients[i].value.protein for i in range(len(ingredients)))
         >= constraints_values.protein.min
@@ -326,7 +379,7 @@ def maximize_taste_penalty_price(
         == constraints_ingredients.fruits
     )
 
-    # optimize
+    # 5. Optimization of the Model
     model.optimize()
 
     # check solution
@@ -335,7 +388,7 @@ def maximize_taste_penalty_price(
             "The model is not optimal -> likely no solution found (infeasible))"
         )
 
-    # solution
+    # 6. Solution Extraction: it returns a Pizza object containing the selected ingredients.
     return Pizza(
         dough=[
             ingredients[i] 

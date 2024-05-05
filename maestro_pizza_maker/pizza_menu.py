@@ -36,6 +36,7 @@ class PizzaMenu:
         #
         # The dataframe should be sorted by the price column in a descendent order
         assert sort_by in PizzaIngredient.__annotations__.keys()
+        assert isinstance(descendent, bool)
         data: List[Dict[str, Union[float, List[PizzaIngredients]]]] = \
         [
             {
@@ -92,6 +93,7 @@ class PizzaMenu:
         # TODO: code a function that removes a pizza from the menu
         # do not forget to check if the pizza is actually in the menu
         # if it is not in the menu, raise a ValueError
+        assert isinstance(pizza, Pizza)
         try:
             self.pizzas.remove(pizza)
         except ValueError:

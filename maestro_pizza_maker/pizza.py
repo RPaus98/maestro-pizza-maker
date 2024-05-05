@@ -98,8 +98,8 @@ class Pizza:
         # the name is unique.
 
         #Uniqueness
-        id = str(uuid.uuid4())
-        len = id.__len__()
+        id: str = str(uuid.uuid4())
+        len: int = id.__len__()
         names: List[str] = [ingredient.value.name for ingredient in self.ingredients]
         return "Pizza_with_" + "_&_".join(names) + "_" + id
 

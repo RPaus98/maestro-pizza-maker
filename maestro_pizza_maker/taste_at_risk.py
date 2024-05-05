@@ -6,7 +6,6 @@
 from maestro_pizza_maker.pizza import Pizza
 from maestro_pizza_maker.pizza_menu import PizzaMenu
 import numpy as np
-from scipy.stats import multivariate_normal
 
 def taste_at_risk_pizza(pizza: Pizza, quantile: float) -> float:
     # TODO: implement the taste at risk measure for a pizza

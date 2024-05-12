@@ -12,7 +12,8 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 
 def menu_sensitivity_protein(menu: PizzaMenu) -> float:
-    # TODO: implement according to the description above
+    # TODO: implement according to the description above 
+    assert isinstance(menu, PizzaMenu)
     prices = np.array([pizza.price for pizza in menu.pizzas])
     proteins = np.array([pizza.protein for pizza in menu.pizzas]).reshape(-1,1)
     model = LinearRegression().fit(proteins, prices)
@@ -21,6 +22,7 @@ def menu_sensitivity_protein(menu: PizzaMenu) -> float:
 
 def menu_sensitivity_carbs(menu: PizzaMenu) -> float:
     # TODO: implement according to the description above
+    assert isinstance(menu, PizzaMenu)
     prices = np.array([pizza.price for pizza in menu.pizzas])
     carbs = np.array([pizza.carbohydrates for pizza in menu.pizzas]).reshape(-1,1)
     model = LinearRegression().fit(carbs, prices)
@@ -29,6 +31,7 @@ def menu_sensitivity_carbs(menu: PizzaMenu) -> float:
 
 def menu_sensitivity_fat(menu: PizzaMenu) -> float:
     # TODO: implement according to the description above
+    assert isinstance(menu, PizzaMenu)
     prices = np.array([pizza.price for pizza in menu.pizzas])
     fat = np.array([pizza.average_fat for pizza in menu.pizzas]).reshape(-1,1)
     model = LinearRegression().fit(fat, prices)
